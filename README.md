@@ -75,7 +75,19 @@ Registers HTTP prefix route on the DSH web server:
 | `get` | `{key}` | Effective value of one key (e.g. `user.name`) |
 | `set-kv` | `{key, value, scope: 'global'\|'local'}` | Set key in every selected repo |
 | `unset-kv` | `{key, scope}` | Unset key in every selected repo |
+| `ws-cred` | — | Workspace credential view: host + username + hasToken from `<ws>/.env`, plus detected remote hosts |
+| `global-cred` | — | Globally shared username/token view (`$DSH_HOME/dsh-git-branch/credential.env`) |
+| `save-ws-cred` | `{host, username, token?}` | Save host → `<ws>/.env`; username/token → global credential file AND `<ws>/.env` (blank token keeps the existing one) |
+| `clear-ws-cred` | — | Remove the plugin-managed keys from `<ws>/.env` only (global file untouched) |
 | `credential` | `{host, username, password}` | `git credential approve` into the configured helper |
+
+Workspace credentials reuse the common per-workspace `.env` pattern: the
+plugin reads/writes `GITLAB_INSTANCE_URL` / `GITLAB_USERNAME` / `GITLAB_TOKEN`
+in `<workspace>/.env`, which pairs with a `credential.helper` script that
+walks up from the repo directory to find its `.env`. The shared username/token
+is also mirrored to `$DSH_HOME/dsh-git-branch/credential.env` so every
+workspace starts from the same defaults — typically only the host differs
+per workspace (`sm` → one GitLab host, `saas` → another).
 
 All endpoints accept `repos: string[] | 'all'` for repo selection. Path safety enforced via `resolve()` + directory scanning (user cannot inject arbitrary paths); clone target dirs must match `[A-Za-z0-9._-]+` and stay inside the workspace.
 
