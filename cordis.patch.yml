@@ -1,0 +1,15 @@
+# ============================================================================
+# dsh-git-branch bundle patch — mounts the plugin row into the DSH config tree
+# ============================================================================
+# This is the canonical row for this package. For the local profile install it
+# is appended to $DSH_HOME/profiles/web/cordis.patch.yml directly (the profile
+# has patchReload: live, so the row mounts without a restart). Keeping a copy
+# here documents the entry id and module specifier.
+#
+#   name: 'dsh-git-branch' resolves to lib/index.js (host half); because
+#   package.json declares dsh.client, the client-modules scanner also serves
+#   lib/client.js to the browser boot graph.
+
+- insert:
+    - id: git-branch
+      name: 'dsh-git-branch'
