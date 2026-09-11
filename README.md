@@ -85,22 +85,24 @@ Registers HTTP prefix route on the DSH web server:
 
 ### Credential model
 
-Two-part layout — **username + token are global, host is per-workspace**:
+Two-part layout — **username + password are global, host is per-workspace**:
 
-- `<workspace>/.env` holds only the host: `GITLAB_INSTANCE_URL` (per workspace:
+- `<workspace>/.env` holds only the host: `GIT_INSTANCE_URL` (per workspace:
   `sm` → one GitLab host, `saas` → another).
-- `$DSH_HOME/dsh-git-branch/credential.env` holds `GITLAB_USERNAME` /
-  `GITLAB_TOKEN` once, shared by every workspace — configure them in the
+- `$DSH_HOME/dsh-git-branch/credential.env` holds `GIT_USERNAME` /
+  `GIT_PASSWORD` once, shared by every workspace — configure them in the
   plugin's 配置 tab, not per workspace.
 - On save the plugin also registers a generated global credential helper
   (`$DSH_HOME/dsh-git-branch/git-credential.sh` as `credential.helper`). On a
   `get` the helper walks up from the repo's working directory to find the
-  nearest `<workspace>/.env`, derives the host from `GITLAB_INSTANCE_URL`,
+  nearest `<workspace>/.env`, derives the host from `GIT_INSTANCE_URL`,
   and when it matches the host git asks about it answers with the global
-  username/token. Unrelated hosts are ignored, so the helper is safe anywhere.
-- Saving via the plugin also scrubs legacy `GITLAB_USERNAME` / `GITLAB_TOKEN`
-  keys from `.env` so the global file is the single source of truth; any
-  pre-existing per-workspace `.git-credential` scripts keep working untouched.
+  username/password. Unrelated hosts are ignored, so the helper is safe anywhere.
+- Keys are provider-neutral (`GIT_` prefix, works for GitLab / GitHub / …);
+  legacy `GITLAB_INSTANCE_URL` / `GITLAB_USERNAME` / `GITLAB_TOKEN` names are
+  still read for compatibility and scrubbed on the next save, so existing
+  `.env` files migrate automatically. Pre-existing per-workspace
+  `.git-credential` scripts keep working untouched.
 
 All endpoints accept `repos: string[] | 'all'` for repo selection. Path safety enforced via `resolve()` + directory scanning (user cannot inject arbitrary paths); clone target dirs must match `[A-Za-z0-9._-]+` and stay inside the workspace.
 
