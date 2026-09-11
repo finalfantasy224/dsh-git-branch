@@ -77,8 +77,10 @@ Registers HTTP prefix route on the DSH web server:
 | `unset-kv` | `{key, scope}` | Unset key in every selected repo |
 | `ws-cred` | — | Workspace credential view: host from `<ws>/.env`, plus detected remote hosts |
 | `global-cred` | — | Globally shared username/token view (`$DSH_HOME/dsh-git-branch/credential.env`) |
-| `save-ws-cred` | `{host, username, token?}` | Save host → `<ws>/.env`; username/token → global credential file AND `<ws>/.env` (blank token keeps the existing one); also registers the generated global helper |
+| `save-ws-cred` | `{host, username, token?}` | Save host → `<ws>/.env`; username/token → global credential file (blank token keeps the existing one); also registers the generated global helper |
 | `clear-ws-cred` | — | Remove the plugin-managed keys from `<ws>/.env` only (global file untouched) |
+| `read-ws-env` | — | Full key/value list of `<ws>/.env` for the 配置 tab editor |
+| `save-ws-env` | `{entries, removeKeys?}` | Write the edited key/value list back to `<ws>/.env` line by line (comments and unrelated vars preserved; keys in `removeKeys` are dropped) |
 | `credential` | `{host, username, password}` | `git credential approve` into the configured helper |
 
 ### Credential model
@@ -107,7 +109,7 @@ All endpoints accept `repos: string[] | 'all'` for repo selection. Path safety e
 Registers a UI entry into the `conversation.input.dock` slot (session-scoped), which renders as a **fixed sidebar hugging the left edge of the conversation column** (not a dock bar above the composer):
 
 - Measures the conversation scrollport + composer seat, positioning the rail with inline styles in the blank lane left of the message column (collapses to a slim tab when the lane is too narrow)
-- Four tabs: **分支** (switch branch, repo table), **同步** (pull / fetch / push / commit), **克隆** (clone form), **配置** (identity + credentials)
+- Four tabs: **分支** (switch branch, repo table), **同步** (pull / fetch / push / commit), **克隆** (clone form), **配置** (identity + global credentials + per-workspace `.env` key/value editor)
 - Branch datalist, per-repo checkboxes, and a timestamped result log shared across tabs
 
 Uses `--dsw-alias-*` CSS variables for theme compatibility with dark/light modes.
