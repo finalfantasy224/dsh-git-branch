@@ -85,24 +85,20 @@ Registers HTTP prefix route on the DSH web server:
 
 ### Credential model
 
-Scope picker in the 配置 tab decides where **host + username** live
-（密码/token 始终存全局，不进工作区）:
+Fixed 仓库级 mode (no scope picker — host is configured per workspace):
 
-- **仓库级（默认）**: `<workspace>/.env` holds `GIT_INSTANCE_URL` +
-  `GIT_USERNAME` per workspace; `$DSH_HOME/dsh-git-branch/credential.env`
-  holds `GIT_PASSWORD` once (shared).
-- **全局**: all three (`GIT_INSTANCE_URL` / `GIT_USERNAME` / `GIT_PASSWORD`)
-  live in `$DSH_HOME/dsh-git-branch/credential.env`, shared by every
-  workspace; the workspace `.env` is scrubbed of those keys on save.
+- `<workspace>/.env` holds `GIT_INSTANCE_URL` + `GIT_USERNAME` per workspace
+  (host + 账号写进工作区 .env，不自动推导).
+- `$DSH_HOME/dsh-git-branch/credential.env` holds `GIT_PASSWORD` once
+  (shared) — the token never enters the workspace `.env`.
 
 On save the plugin also registers a generated global credential helper
 (`$DSH_HOME/dsh-git-branch/git-credential.sh` as `credential.helper`). On a
 `get` the helper walks up from the repo's working directory to find the
 nearest `<workspace>/.env`, derives the host from `GIT_INSTANCE_URL`, and
-when it matches the host git asks about it answers with the matching
-username/password. If no workspace `.env` matches (全局 mode), the helper
-falls back to the global file's `GIT_INSTANCE_URL`. Unrelated hosts are
-ignored, so the helper is safe anywhere.
+when it matches the host git asks about it answers with the workspace
+username + global password. Unrelated hosts are ignored, so the helper is
+safe anywhere.
 
 Keys are provider-neutral (`GIT_` prefix, works for GitLab / GitHub / …);
 legacy `GITLAB_INSTANCE_URL` / `GITLAB_USERNAME` / `GITLAB_TOKEN` names are
