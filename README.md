@@ -73,32 +73,32 @@ Registers HTTP prefix route on the DSH web server:
 |--------|------------|-------------|
 | `list` | — | Effective config of the first repo (with origin paths) |
 | `get` | `{key}` | Effective value of one key (e.g. `user.name`) |
-| `set-kv` | `{key, value, scope: 'global'\|'local'}` | Set key in every selected repo |
+| `set-kv` | `{key, value, scope: 'global'\|'local'}` | Set key in every selected repo (identity is configured global) |
 | `unset-kv` | `{key, scope}` | Unset key in every selected repo |
-| `ws-cred` | — | Workspace credential view: host from `<ws>/.env`, plus detected remote hosts |
-| `global-cred` | — | Globally shared username/token view (`$DSH_HOME/dsh-git-branch/credential.env`) |
-| `save-ws-cred` | `{host, username, token?}` | Save host → `<ws>/.env`; username/token → global credential file (blank token keeps the existing one); also registers the generated global helper |
-| `clear-ws-cred` | — | Remove the plugin-managed keys from `<ws>/.env` only (global file untouched) |
+| `ws-cred` | — | Workspace credential view: host/username/hasToken from `<ws>/.env`, plus detected remote hosts |
+| `save-ws-cred` | `{host, username, token?}` | Save host + username + password → `<ws>/.env` (blank password keeps the existing one); also registers the generated credential helper |
+| `clear-ws-cred` | — | Remove the plugin-managed keys from `<ws>/.env` |
 | `read-ws-env` | — | Full key/value list of `<ws>/.env` for the 配置 tab editor |
 | `save-ws-env` | `{entries, removeKeys?}` | Write the edited key/value list back to `<ws>/.env` line by line (comments and unrelated vars preserved; keys in `removeKeys` are dropped) |
 | `credential` | `{host, username, password}` | `git credential approve` into the configured helper |
 
 ### Credential model
 
-Fixed 仓库级 mode (no scope picker — host is configured per workspace):
+Everything lives in the workspace — no global credential file:
 
-- `<workspace>/.env` holds `GIT_INSTANCE_URL` + `GIT_USERNAME` per workspace
-  (host + 账号写进工作区 .env，不自动推导).
-- `$DSH_HOME/dsh-git-branch/credential.env` holds `GIT_PASSWORD` once
-  (shared) — the token never enters the workspace `.env`.
+- `<workspace>/.env` holds `GIT_INSTANCE_URL` (host) + `GIT_USERNAME`
+  (账号) + `GIT_PASSWORD` (密码/token), plus the business key
+  `REQUIREMENT_ID` used by commit convention.
+- Identity (`user.name` / `user.email`) is configured **globally** in
+  `~/.gitconfig`, same for every workspace.
 
-On save the plugin also registers a generated global credential helper
+On save the plugin also registers a generated credential helper
 (`$DSH_HOME/dsh-git-branch/git-credential.sh` as `credential.helper`). On a
 `get` the helper walks up from the repo's working directory to find the
 nearest `<workspace>/.env`, derives the host from `GIT_INSTANCE_URL`, and
-when it matches the host git asks about it answers with the workspace
-username + global password. Unrelated hosts are ignored, so the helper is
-safe anywhere.
+when it matches the host git asks about it answers with that .env's
+username + password. Unrelated hosts (or a .env lacking credentials) are
+ignored, so the helper is safe anywhere.
 
 Keys are provider-neutral (`GIT_` prefix, works for GitLab / GitHub / …);
 legacy `GITLAB_INSTANCE_URL` / `GITLAB_USERNAME` / `GITLAB_TOKEN` names are
