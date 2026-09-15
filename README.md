@@ -75,11 +75,11 @@ Registers HTTP prefix route on the DSH web server:
 | `get` | `{key}` | Effective value of one key (e.g. `user.name`) |
 | `set-kv` | `{key, value, scope: 'global'\|'local'}` | Set key in every selected repo (identity is configured global) |
 | `unset-kv` | `{key, scope}` | Unset key in every selected repo |
-| `ws-cred` | — | Workspace credential view: host/username/hasToken from `<ws>/.env`, plus detected remote hosts |
-| `save-ws-cred` | `{host, username, token?}` | Save host + username + password → `<ws>/.env` (blank password keeps the existing one); also registers the generated credential helper |
+| `ws-cred` | — | Workspace credential view: host/username/hasToken/requirementId from `<ws>/.env`, plus detected remote hosts |
+| `save-ws-cred` | `{host, username, token?, requirementId?}` | Save host + username + password + REQUIREMENT_ID → `<ws>/.env` (blank password keeps the existing one); also registers the generated credential helper |
 | `clear-ws-cred` | — | Remove the plugin-managed keys from `<ws>/.env` |
-| `read-ws-env` | — | Full key/value list of `<ws>/.env` for the 配置 tab editor |
-| `save-ws-env` | `{entries, removeKeys?}` | Write the edited key/value list back to `<ws>/.env` line by line (comments and unrelated vars preserved; keys in `removeKeys` are dropped) |
+| `read-ws-env` | — | Full key/value list of `<ws>/.env` (legacy, kept for API compatibility) |
+| `save-ws-env` | `{entries, removeKeys?}` | Write the edited key/value list back to `<ws>/.env` (legacy, kept for API compatibility) |
 | `credential` | `{host, username, password}` | `git credential approve` into the configured helper |
 
 ### Credential model
@@ -113,7 +113,7 @@ All endpoints accept `repos: string[] | 'all'` for repo selection. Path safety e
 Registers a UI entry into the `conversation.input.dock` slot (session-scoped), which renders as a **fixed sidebar hugging the left edge of the conversation column** (not a dock bar above the composer):
 
 - Measures the conversation scrollport + composer seat, positioning the rail with inline styles in the blank lane left of the message column (collapses to a slim tab when the lane is too narrow)
-- Four tabs: **分支** (switch branch, repo table), **同步** (pull / fetch / push / commit), **克隆** (clone form), **配置** (identity + global credentials + per-workspace `.env` key/value editor)
+- Four tabs: **分支** (switch branch, repo table), **同步** (pull / fetch / push / commit), **克隆** (clone form), **配置** (global identity + workspace credential form: host / username / password / REQUIREMENT_ID, all saved into `<ws>/.env` — no line-level `.env` editor)
 - Branch datalist, per-repo checkboxes, and a timestamped result log shared across tabs
 
 Uses `--dsw-alias-*` CSS variables for theme compatibility with dark/light modes.
