@@ -74,7 +74,7 @@ Registers HTTP prefix route on the DSH web server:
 | `list` | — | Effective config of the first repo (with origin paths) |
 | `get` | `{key}` | Effective value of one key (e.g. `user.name`) |
 | `set-kv` | `{key, value, scope: 'global'\|'local'}` | Set key in every selected repo (identity is configured global) |
-| `unset-kv` | `{key, scope}` | Unset key in every selected repo |
+| `unset-kv` | `{key}` | Unset key in every selected repo (always repo/local scope) |
 | `ws-cred` | — | Workspace credential view: host/username/hasToken/requirementId from `<ws>/.env`, plus detected remote hosts |
 | `save-ws-cred` | `{host, username, token?, requirementId?}` | Save host + username + password + REQUIREMENT_ID → `<ws>/.env` (blank password keeps the existing one); also registers the generated credential helper |
 | `clear-ws-cred` | — | Remove the plugin-managed keys from `<ws>/.env` |
@@ -89,8 +89,7 @@ Everything lives in the workspace — no global credential file:
 - `<workspace>/.env` holds `GIT_INSTANCE_URL` (host) + `GIT_USERNAME`
   (账号) + `GIT_PASSWORD` (密码/token), plus the business key
   `REQUIREMENT_ID` used by commit convention.
-- Identity (`user.name` / `user.email`) is configured **globally** in
-  `~/.gitconfig`, same for every workspace.
+- Identity (`user.name` / `user.email`) is configured **at the repo level** (`--local`) in each workspace's `.git/config`.
 
 On save the plugin also registers a generated credential helper
 (`$DSH_HOME/dsh-git-branch/git-credential.sh` as `credential.helper`). On a
